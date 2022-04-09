@@ -1,0 +1,143 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <title>WebSocket - by jt9.top </title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/jquery.mobile.flatui.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/fileinput.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/index.css}">
+    <!--图标库-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+</head>
+<body>
+<div data-role="page">
+    <div data-role="header" class="header linear-g">
+        <a href="#panel-left" data-iconpos="notext" class="glyphicon glyphicon-th-large col-xs-2 text-right"> </a>
+        <a class="text-center col-xs-8">jt9.top</a>
+        <a href="#panel-right" data-iconpos="notext" class="glyphicon glyphicon-user col-xs-2 text-left"> </a>
+    </div>
+    <div data-role="panel" data-position="left" data-display="push" class="list-group shortcut_menu dn linear-g"
+         id="panel-left">
+        <a href="#" class="list-group-item"><span class="glyphicon glyphicon-home"> </span> &nbsp;菜单1</a>
+        <a href="#" class="list-group-item"><span class="glyphicon glyphicon-edit"> </span> &nbsp;菜单2</a>
+        <a href="#" class="list-group-item"><span class="glyphicon glyphicon-list"> </span> &nbsp;菜单3</a>
+        <a href="#" class="list-group-item"><span class="glyphicon glyphicon-list-alt"> </span> &nbsp;菜单4</a>
+    </div>
+    <div data-role="panel" data-position="right" data-display="push" class="user_box text-center dn linear-g"
+         id="panel-right">
+        <div class="u_info">
+            <img class="avatar" id="userImage" th:src="@{/images/user_default.png}" alt="头像">
+            <span class="username" id="userName">userName</span>
+        </div>
+        <ul class="user_menu">
+            <li class="menu"><a id="baseSetting" href="javascript:void(0)"><span class="glyphicon glyphicon-cog"> </span> &nbsp;基本设置</a></li>
+            <li class="menu"><a id="updatePwd" href="javascript:void(0)"><span class="glyphicon glyphicon-lock"> </span> &nbsp;修改密码</a></li>
+            <li class="menu"><a id="uploadImg" href="javascript:void(0)"><span class="glyphicon glyphicon-picture"> </span> &nbsp;上传头像</a></li>
+            <li class="menu"><a id="logout" href="javascript:void(0)"><span class="glyphicon glyphicon-off"> </span>
+                &nbsp;安全退出</a></li>
+        </ul>
+    </div>
+    <div data-role="content" class="container" role="main">
+        <ul class="content-reply-box mg10" id="message_content">
+            <li class="odd">
+                <a class="user" href="#"><img class="img-responsive avatar_ myImg" th:src="@{/images/AI.png}"
+                                              alt=""><span class="user-name">小智</span></a>
+                <div class="reply-content-box">
+                    <span class="reply-time">[[${#dates.format(new java.util.Date().getTime(), 'yyyy-MM-dd HH:mm:ss')}]]</span>
+                    <div class="reply-content pr">
+                        <span class="arrow">&nbsp;</span>
+                        海内存知己，天涯若比邻。
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <ul class="operating row text-center linear-g my_bottom">
+            <li class="col-xs-4"><a href="javascript:void(0)"><span class="glyphicon glyphicon-tags"></span>
+                &nbsp;标签</a></li>
+            <li class="col-xs-4"><a href="javascript:void(0)" id="show_sendMsg"><span
+                    class="glyphicon glyphicon-comment"></span> &nbsp;回复</a></li>
+            <li class="col-xs-4"><a href="javascript:void(0)"><span class="glyphicon glyphicon-heart"></span>
+                &nbsp;喜欢</a></li>
+        </ul>
+
+        <div style="display:none;margin: 10px 0;padding: 10px" id="box_send_msg">
+            <form role="form">
+                <div class="form-group">
+                    <textarea id="message" class="form-control" rows="1" name="message"></textarea>
+                </div>
+            </form>
+            <div style="float: right">
+                <button id="cancelSend" class="btn btn-primary">取消</button>
+                <button id="sendMsg" class="btn btn-primary">发送</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- 头像上传框 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <form method="post" id="mm" enctype="multipart/form-data">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">请选择要上传的图片</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="control-group">
+                        <label class="control-label" for="img_upload">上传图片</label>
+                        <div class="controls">
+                            <input class="input-file uniform_on" id="img_upload" name="img_upload"
+                                   type="file">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<!-- 找回密码框 -->
+<div class="modal fade" id="searchPwd-window" tabindex="-1" role="dialog" aria-labelledby="pwd_myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="pwd_myModalLabel">重置密码</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-inline" role="form">
+                    <label for="new_password">新&ensp;密&ensp;码:</label>
+                    <input id="new_password" name="new_password" autocomplete type="password" class="form-control" placeholder="请设置您的新密码(不少于6位)" />
+                    <br />
+                    <br />
+                    <label for="again_password">确认密码:</label>
+                    <input id="again_password" name="again_password" autocomplete type="password" class="form-control" placeholder="请再次确认您的新密码" />
+                    <br />
+                    <br />
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="resetPwd" class="btn btn-primary">重置密码</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/jquery.mobile-1.4.0-rc.1.js}"></script>
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/fileinput.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/fileinput_locale_zh.js}"></script>
+<script type="text/javascript" th:src="@{/js/qiniu.js}"></script>
+<script type="text/javascript" th:src="@{/js/my_bootstrap_alert.js}"></script>
+<script type="text/javascript" th:src="@{/js/index.js}"></script>
+<script type="text/javascript">
+
+</script>
+</body>
+</html>

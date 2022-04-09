@@ -1,0 +1,14 @@
+@CHARSET "UTF-8";
+.myImg{
+    width: 50px;
+    height: 50px;
+}
+.ui-loader{
+    display: none !important;
+}
+#cancelSend,#sendMsg{
+    margin-bottom: 15px !important;
+}
+.my_bottom{
+    margin-bottom: 20px;
+}

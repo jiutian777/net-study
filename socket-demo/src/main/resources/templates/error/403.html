@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}">
+    <title>403</title>
+    <style>
+        body {
+            background-image: url(/images/403.jpg);
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: rgb(241, 242, 246);
+        }
+    </style>
+</head>
+<body>
+<script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/my_bootstrap_alert.js}"></script>
+<script>
+    $(function () {
+        var timeDown = function (obj, value) {
+            if (obj === undefined || obj === null) {
+                return;
+            }
+            var totalSeconds = value / 1000;
+            $(obj).html(totalSeconds + "秒后跳转到登录页面....");
+            if (totalSeconds > 0) {
+                setTimeout(function () {
+                    timeDown(obj, value - 1000);
+                }, 1000);
+            } else {
+                $.ajax({
+                    type: 'GET',
+                    url: "/user/logout",
+                    success: function (data) {
+                        if (data.code === '200') {
+                            window.location.href = '/toLogin';
+                        }
+                    },error: function () {
+
+                    }
+                });
+            }
+        };
+        commonUtil.message("2秒后跳转到登录页面....", "info", 2000);
+        timeDown($('.alert'),2000);
+    });
+</script>
+</body>
+</html>
