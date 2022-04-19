@@ -22,7 +22,6 @@
         <module>tcp-udp</module>
         <module>socket-demo</module>
         <module>tcp-demo</module>
-        <module>school-net</module>
     </modules>
 
     <dependencies>

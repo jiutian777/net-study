@@ -57,10 +57,11 @@ $(function () {
                     commonUtil.message("文件上传失败！", "info");
                 }, 1000);
             }).on("fileuploaded", function (event, data, previewId, index) {  //一个文件上传完成
+                console.log(data);
                 if (data.response.code === 200) {
                     qiNiuUpload(data.response);
                 } else {
-                    commonUtil.message(data.response.message, "info");                  //获取凭证失败
+                    commonUtil.message(data.response.message, "info");  //获取凭证失败
                 }
             })
         }
@@ -156,7 +157,7 @@ $(function () {
         websocket.onmessage = function (event) {
             // 服务端发送的消息
             var msg = event.data;
-            console.log("msg:" + msg);
+            // console.log("msg:" + msg);
             if (isJSON(msg)) {
                 var jsonObj = JSON.parse(msg);
                 if (jsonObj.code === "403") {

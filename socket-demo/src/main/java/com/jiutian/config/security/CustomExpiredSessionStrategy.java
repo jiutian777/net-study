@@ -1,5 +1,6 @@
 package com.jiutian.config.security;
 
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.session.SessionInformationExpiredEvent;
@@ -20,11 +21,12 @@ public class CustomExpiredSessionStrategy implements SessionInformationExpiredSt
 
     @Override
     public void onExpiredSessionDetected(SessionInformationExpiredEvent event) throws IOException {
-        System.out.println("CustomExpiredSessionStrategy----并发登陆");
+        User principal = (User) event.getSessionInformation().getPrincipal();
+        System.out.println("CustomExpiredSessionStrategy----onExpiredSessionDetected： the user[ " +
+                principal.getUsername() + " ] is sendRedirect to login page");
+        redirectStrategy.sendRedirect(event.getRequest(), event.getResponse(), "/toLogin");
 
-        redirectStrategy.sendRedirect(event.getRequest(),event.getResponse(),"/toLogin");
-
-        //告诉前端并发登陆异常
+        // 告诉前端并发登陆异常
         // event.getResponse().setContentType("application/json;charset=UTF-8");
         // event.getResponse().getWriter().write(objectMapper
         //         .writeValueAsString(ResultBody.error("403",

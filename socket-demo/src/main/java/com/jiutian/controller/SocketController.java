@@ -65,13 +65,13 @@ public class SocketController implements MyAuthenticationSuccessHandler.OnSessio
      */
     @OnOpen
     public void OnOpen(@PathParam("username") String name, Session session) throws JsonProcessingException {
-        sessionPools.put(name, session);
         incrOnlineCount();
+        sessionPools.put(name, session);
         System.out.println(name + "加入webSocket！当前人数为" + onlineNum);
         String message = "欢迎用户[ " + name + " ]来到聊天室";
         System.out.println(message);
         sendMessageAll(objectMapper.writeValueAsString
-                (ResultBody.success("210",message)));
+                (ResultBody.success("210", message)));
     }
 
     /**
@@ -98,17 +98,22 @@ public class SocketController implements MyAuthenticationSuccessHandler.OnSessio
      */
     @OnClose
     public void onClose(@PathParam("username") String username, Session session) throws JsonProcessingException {
-        //移除session
-        sessionPools.remove(username);
-        decrOnlineCount();
-        //通知他人
-        String msg = "用户[ " + username + " ]已经离开聊天室";
-        sendMessageAll(objectMapper
-                .writeValueAsString(ResultBody.success("210",msg)));
-        try {
-            session.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(sessionPools.containsKey(username)){
+            // 判断同一用户 的两次 session 是否是同一个
+            if(sessionPools.get(username) == session){
+                decrOnlineCount();
+                // 移除 session
+                sessionPools.remove(username);
+                // 通知他人
+                String msg = "用户[ " + username + " ]已经离开聊天室";
+                sendMessageAll(objectMapper
+                        .writeValueAsString(ResultBody.success("210", msg)));
+                try {
+                    session.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -178,8 +183,11 @@ public class SocketController implements MyAuthenticationSuccessHandler.OnSessio
     public void callLogOut(String name) {
         if (sessionPools.containsKey(name)) {
             try {
-                System.out.println("call " + name + " LogOut");
+                System.out.println(name + " is already online , call LogOut");
                 sendMessageTo(name);
+                // 移除 Session
+                sessionPools.remove(name);
+                decrOnlineCount();
             } catch (IOException e) {
                 e.printStackTrace();
             }
